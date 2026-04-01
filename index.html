@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rockit Trucking — Site Editor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0ecff;color:#111;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+#header{background:#2D0066;color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:3px solid #FFE500;}
+#header h1{font-size:14px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px;}
+.hdr-logo{height:30px;width:30px;border-radius:6px;object-fit:cover;}
+.hdr-right{display:flex;gap:8px;align-items:center;}
+.hdr-btn{padding:7px 16px;border-radius:100px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;transition:opacity .15s;}
+.hdr-btn:hover{opacity:.82;}
+.hdr-dl{background:#FFE500;color:#2D0066;}
+.hdr-tab{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);}
+.hdr-badge{background:#39FF14;color:#2D0066;font-size:10px;font-weight:800;padding:3px 9px;border-radius:50px;letter-spacing:.04em;}
+
+/* ── WORKSPACE ── */
+#workspace{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+#sidebar{width:310px;min-width:280px;background:#fff;border-right:1px solid #ddd;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+#stabs{display:flex;flex-wrap:wrap;gap:2px;padding:7px 7px 0;background:#fafafa;border-bottom:1px solid #ddd;}
+.stab{padding:5px 9px;border-radius:6px 6px 0 0;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;color:#999;background:transparent;border:none;}
+.stab:hover{color:#8B00FF;}
+.stab.active{background:#fff;color:#2D0066;border:1px solid #ddd;border-bottom:1px solid #fff;margin-bottom:-1px;}
+#sbody{flex:1;overflow-y:auto;padding:11px;}
+#sbody::-webkit-scrollbar{width:4px;}
+#sbody::-webkit-scrollbar-thumb{background:#e0d4f5;border-radius:4px;}
+
+.spanel{display:none;}
+.spanel.active{display:block;}
+
+.sc{background:#fff;border:1.5px solid #ece5ff;border-radius:10px;padding:12px;margin-bottom:10px;}
+.sc h3{font-size:12px;font-weight:700;margin-bottom:2px;color:#2D0066;}
+.sc>p{font-size:10.5px;color:#aaa;margin-bottom:8px;line-height:1.5;}
+.f{margin-bottom:8px;}
+.f:last-child{margin-bottom:0;}
+.f label{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#bbb;margin-bottom:3px;}
+.f input[type=text],.f textarea,.f select{width:100%;padding:6px 9px;border:1.5px solid #dde;border-radius:7px;font-family:inherit;font-size:12.5px;color:#111;outline:none;transition:border-color .15s;background:#fafaff;}
+.f input[type=text]:focus,.f textarea:focus{border-color:#8B00FF;}
+.f textarea{resize:vertical;min-height:58px;line-height:1.5;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;}
+.cf{display:flex;gap:7px;align-items:center;}
+.cf input[type=color]{width:34px;height:30px;border:1.5px solid #ddd;border-radius:7px;padding:2px;cursor:pointer;flex-shrink:0;}
+.cf input[type=text]{flex:1;}
+.abtn{width:100%;padding:8px;border-radius:7px;background:#8B00FF;color:#FFE500;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;margin-top:7px;transition:opacity .15s;letter-spacing:.02em;}
+.abtn:hover{opacity:.85;}
+.abtn.lime{background:#2D0066;}
+.st{font-size:11px;font-weight:600;padding:4px 0 0;display:none;}
+.st.ok{color:#1a7a3a;display:block;}
+.st.err{color:#a32d2d;display:block;}
+.f input[type=range]{width:100%;accent-color:#8B00FF;}
+.rv{font-size:10px;color:#8B00FF;font-weight:700;float:right;}
+
+/* ── PREVIEW PANEL ── */
+#preview-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#e8e0f5;}
+#preview-toolbar{background:#fff;border-bottom:1px solid #ddd;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#preview-toolbar span{font-size:11.5px;color:#888;font-weight:500;}
+.ptool-right{display:flex;gap:8px;align-items:center;}
+#device-btns{display:flex;gap:4px;}
+.dbtn{padding:5px 12px;border-radius:6px;border:1.5px solid #ddd;background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#666;transition:all .15s;}
+.dbtn.active,.dbtn:hover{background:#2D0066;color:#FFE500;border-color:#2D0066;}
+#refresh-btn{padding:6px 14px;border-radius:100px;background:#8B00FF;color:#FFE500;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;}
+#refresh-btn:hover{opacity:.85;}
+#preview-wrap{flex:1;overflow:auto;display:flex;justify-content:center;padding:16px;}
+#preview-scaler{transition:all .3s;background:#fff;box-shadow:0 4px 28px rgba(45,0,102,.2);border-radius:8px;overflow:hidden;}
+#preview-scaler.desktop{width:1000px;min-height:600px;}
+#preview-scaler.mobile{width:390px;min-height:700px;border-radius:22px;box-shadow:0 8px 40px rgba(45,0,102,.3);}
+#preview-content{width:100%;border:none;display:block;}
+
+/* ── PASSWORD WALL ── */
+#auth-wall{display:flex;position:fixed;inset:0;z-index:9999;background:#f0ecff;align-items:center;justify-content:center;flex-direction:column;}
+.pw-box{background:#fff;border-radius:18px;padding:40px 36px;max-width:400px;width:90%;box-shadow:0 8px 50px rgba(45,0,102,.15);text-align:center;border-top:5px solid #8B00FF;}
+.pw-logo{width:72px;height:72px;border-radius:16px;object-fit:cover;margin:0 auto 18px;display:block;}
+.pw-box h1{font-size:20px;font-weight:800;margin-bottom:6px;color:#2D0066;}
+.pw-box p{font-size:13.5px;color:#777;margin-bottom:22px;line-height:1.6;}
+#pw-input{width:100%;padding:12px 14px;border:2px solid #ddd;border-radius:10px;font-family:inherit;font-size:15px;color:#111;outline:none;margin-bottom:12px;text-align:center;letter-spacing:3px;transition:border-color .2s;}
+#pw-input:focus{border-color:#8B00FF;}
+#pw-go{width:100%;padding:13px;border-radius:100px;background:#8B00FF;color:#FFE500;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;letter-spacing:.04em;}
+#pw-go:hover{opacity:.88;}
+#pw-err{display:none;background:#fde8e8;color:#a32d2d;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;margin-top:10px;}
+.pw-foot{font-size:11.5px;color:#bbb;margin-top:18px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PASSWORD WALL ══════════════ -->
+<div id="auth-wall">
+  <div class="pw-box">
+    <img src="images/logo.png" class="pw-logo" onerror="this.style.display='none'" />
+    <h1>Rockit Site Editor</h1>
+    <p>Enter your password to access the website editor.</p>
+    <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()" />
+    <button id="pw-go" onclick="checkPw()">Unlock Editor 🔓</button>
+    <div id="pw-err">Incorrect password. Try again.</div>
+  </div>
+  <p class="pw-foot">Rockit Trucking Inc. &copy; 2026 &mdash; Elizabethtown, KY</p>
+</div>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<div id="header">
+  <h1>
+    <img src="images/logo.png" class="hdr-logo" onerror="this.style.display='none'" />
+    🚛 Rockit Trucking &mdash; Site Editor
+    <span class="hdr-badge">LIVE</span>
+  </h1>
+  <div class="hdr-right">
+    <button class="hdr-btn hdr-tab" onclick="openNewTab()">↗ Open in New Tab</button>
+    <button class="hdr-btn hdr-dl" onclick="downloadSite()">⬇ Download Site</button>
+  </div>
+</div>
+
+<!-- ══════════════ WORKSPACE ══════════════ -->
+<div id="workspace">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="stabs">
+      <button class="stab active" onclick="switchTab('text',this)">Text</button>
+      <button class="stab" onclick="switchTab('colors',this)">Colors</button>
+      <button class="stab" onclick="switchTab('verses',this)">Verses</button>
+      <button class="stab" onclick="switchTab('services',this)">Services</button>
+      <button class="stab" onclick="switchTab('contact',this)">Contact</button>
+      <button class="stab" onclick="switchTab('careers',this)">Careers</button>
+      <button class="stab" onclick="switchTab('fr',this)">Find &amp; Replace</button>
+    </div>
+    <div id="sbody">
+
+      <!-- ── TEXT ── -->
+      <div class="spanel active" id="panel-text">
+        <div class="sc"><h3>Hero Section</h3>
+          <div class="f"><label>Tagline</label><textarea id="t-tagline"></textarea></div>
+          <div class="f"><label>Location Subtitle</label><input type="text" id="t-location" /></div>
+          <button class="abtn" onclick="apply('hero')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-hero"></div>
+        </div>
+        <div class="sc"><h3>About Us</h3>
+          <div class="f"><label>Paragraph 1</label><textarea id="t-about1"></textarea></div>
+          <div class="f"><label>Paragraph 2</label><textarea id="t-about2"></textarea></div>
+          <button class="abtn" onclick="apply('about')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-about"></div>
+        </div>
+        <div class="sc"><h3>Family Section</h3>
+          <div class="f"><label>Headline</label><input type="text" id="t-fam-title" /></div>
+          <div class="f"><label>Description</label><textarea id="t-fam-text"></textarea></div>
+          <button class="abtn" onclick="apply('family')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-family"></div>
+        </div>
+        <div class="sc"><h3>Reviews</h3>
+          <div class="f"><label>Review 1 Text</label><input type="text" id="t-r1-text" /></div>
+          <div class="f"><label>Review 1 Author</label><input type="text" id="t-r1-author" /></div>
+          <div class="f"><label>Review 2 Text</label><input type="text" id="t-r2-text" /></div>
+          <div class="f"><label>Review 2 Author</label><input type="text" id="t-r2-author" /></div>
+          <button class="abtn" onclick="apply('reviews')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-reviews"></div>
+        </div>
+        <div class="sc"><h3>Footer</h3>
+          <div class="f"><label>Tagline</label><textarea id="t-ftag"></textarea></div>
+          <div class="f"><label>Copyright Line</label><input type="text" id="t-copy" /></div>
+          <button class="abtn" onclick="apply('footer')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-footer"></div>
+        </div>
+      </div>
+
+      <!-- ── COLORS ── -->
+      <div class="spanel" id="panel-colors">
+        <div class="sc"><h3>Brand Colors</h3><p>Drawn from the Rockit logo. Changing these updates the whole site.</p>
+          <div class="f"><label>Purple (Backgrounds)</label><div class="cf"><input type="color" id="c-purple" oninput="sh('c-purple','c-purple-h')"><input type="text" id="c-purple-h" oninput="sp('c-purple-h','c-purple')"></div></div>
+          <div class="f"><label>Dark Purple (Nav / Footer)</label><div class="cf"><input type="color" id="c-dark" oninput="sh('c-dark','c-dark-h')"><input type="text" id="c-dark-h" oninput="sp('c-dark-h','c-dark')"></div></div>
+          <div class="f"><label>Yellow (Accents / Text)</label><div class="cf"><input type="color" id="c-yellow" oninput="sh('c-yellow','c-yellow-h')"><input type="text" id="c-yellow-h" oninput="sp('c-yellow-h','c-yellow')"></div></div>
+          <div class="f"><label>Lime Green (Accents)</label><div class="cf"><input type="color" id="c-lime" oninput="sh('c-lime','c-lime-h')"><input type="text" id="c-lime-h" oninput="sp('c-lime-h','c-lime')"></div></div>
+          <div class="f"><label>Pink (Highlights)</label><div class="cf"><input type="color" id="c-pink" oninput="sh('c-pink','c-pink-h')"><input type="text" id="c-pink-h" oninput="sp('c-pink-h','c-pink')"></div></div>
+          <div class="f"><label>Orange (Highlights)</label><div class="cf"><input type="color" id="c-orange" oninput="sh('c-orange','c-orange-h')"><input type="text" id="c-orange-h" oninput="sp('c-orange-h','c-orange')"></div></div>
+          <button class="abtn" onclick="apply('colors')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-colors"></div>
+        </div>
+      </div>
+
+      <!-- ── VERSES ── -->
+      <div class="spanel" id="panel-verses">
+        <div class="sc"><h3>Hero Bible Verse</h3>
+          <div class="f"><label>Verse Text</label><textarea id="v-hero"></textarea></div>
+          <div class="f"><label>Reference (e.g. Philippians 4:13)</label><input type="text" id="v-hero-ref" /></div>
+          <button class="abtn" onclick="apply('vhero')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-vhero"></div>
+        </div>
+        <div class="sc"><h3>About Section Verse</h3>
+          <div class="f"><label>Verse Text</label><textarea id="v-about"></textarea></div>
+          <div class="f"><label>Reference</label><input type="text" id="v-about-ref" /></div>
+          <button class="abtn" onclick="apply('vabout')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-vabout"></div>
+        </div>
+        <div class="sc"><h3>Faith Section Verse</h3>
+          <div class="f"><label>Verse Text</label><textarea id="v-faith"></textarea></div>
+          <div class="f"><label>Reference</label><input type="text" id="v-faith-ref" /></div>
+          <button class="abtn" onclick="apply('vfaith')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-vfaith"></div>
+        </div>
+        <div class="sc"><h3>Banner Verse (Yellow Strip)</h3>
+          <div class="f"><label>Verse Text</label><textarea id="v-banner"></textarea></div>
+          <div class="f"><label>Reference</label><input type="text" id="v-banner-ref" /></div>
+          <button class="abtn" onclick="apply('vbanner')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-vbanner"></div>
+        </div>
+        <div class="sc"><h3>Family Section Verse</h3>
+          <div class="f"><label>Verse Text</label><textarea id="v-family"></textarea></div>
+          <div class="f"><label>Reference</label><input type="text" id="v-family-ref" /></div>
+          <button class="abtn" onclick="apply('vfamily')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-vfamily"></div>
+        </div>
+      </div>
+
+      <!-- ── SERVICES ── -->
+      <div class="spanel" id="panel-services">
+        <div class="sc"><h3>Service 1</h3>
+          <div class="f"><label>Title</label><input type="text" id="sv1-title" /></div>
+          <div class="f"><label>Description</label><textarea id="sv1-desc"></textarea></div>
+          <button class="abtn" onclick="apply('services')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-svc"></div>
+        </div>
+        <div class="sc"><h3>Service 2</h3>
+          <div class="f"><label>Title</label><input type="text" id="sv2-title" /></div>
+          <div class="f"><label>Description</label><textarea id="sv2-desc"></textarea></div>
+          <button class="abtn" onclick="apply('services')">Apply &amp; Refresh Preview</button>
+        </div>
+        <div class="sc"><h3>Service 3</h3>
+          <div class="f"><label>Title</label><input type="text" id="sv3-title" /></div>
+          <div class="f"><label>Description</label><textarea id="sv3-desc"></textarea></div>
+          <button class="abtn" onclick="apply('services')">Apply &amp; Refresh Preview</button>
+        </div>
+      </div>
+
+      <!-- ── CONTACT ── -->
+      <div class="spanel" id="panel-contact">
+        <div class="sc"><h3>Contact Information</h3><p>Updates everywhere this info appears on the site.</p>
+          <div class="f"><label>Phone Number</label><input type="text" id="ct-phone" /></div>
+          <div class="f"><label>Address Line 1</label><input type="text" id="ct-a1" /></div>
+          <div class="f"><label>Address Line 2</label><input type="text" id="ct-a2" /></div>
+          <button class="abtn" onclick="apply('contact')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-contact"></div>
+        </div>
+        <div class="sc"><h3>Office Hours</h3>
+          <div class="f"><label>Weekday Hours</label><input type="text" id="ct-hours" /></div>
+          <div class="f"><label>Weekend</label><input type="text" id="ct-weekend" /></div>
+          <button class="abtn" onclick="apply('contact')">Apply &amp; Refresh Preview</button>
+        </div>
+      </div>
+
+      <!-- ── CAREERS ── -->
+      <div class="spanel" id="panel-careers">
+        <div class="sc"><h3>Careers Section</h3>
+          <div class="f"><label>Section Headline</label><input type="text" id="car-title" /></div>
+          <div class="f"><label>Description Paragraph</label><textarea id="car-text"></textarea></div>
+          <div class="f"><label>Apply Button URL</label><input type="text" id="car-url" /></div>
+          <button class="abtn" onclick="apply('careers')">Apply &amp; Refresh Preview</button>
+          <div class="st" id="s-careers"></div>
+        </div>
+        <div class="sc"><h3>Job Perks</h3>
+          <div class="f"><label>Perk 1</label><input type="text" id="pr1" /></div>
+          <div class="f"><label>Perk 2</label><input type="text" id="pr2" /></div>
+          <div class="f"><label>Perk 3</label><input type="text" id="pr3" /></div>
+          <div class="f"><label>Perk 4</label><input type="text" id="pr4" /></div>
+          <div class="f"><label>Perk 5</label><input type="text" id="pr5" /></div>
+          <button class="abtn" onclick="apply('careers')">Apply &amp; Refresh Preview</button>
+        </div>
+      </div>
+
+      <!-- ── FIND & REPLACE ── -->
+      <div class="spanel" id="panel-fr">
+        <div class="sc"><h3>Find &amp; Replace</h3><p>Change any word or phrase anywhere on the site.</p>
+          <div class="f"><label>Find <span id="fc" style="color:#8B00FF;font-size:9.5px;font-weight:700;"></span></label><input type="text" id="fr-f" placeholder="Text to find…" oninput="countM()"></div>
+          <div class="f"><label>Replace With</label><input type="text" id="fr-r" placeholder="Replacement…"></div>
+          <div style="display:flex;gap:6px;">
+            <button class="abtn" onclick="doReplace()" style="flex:1;margin-top:7px;">Replace All</button>
+            <button class="abtn lime" onclick="countM()" style="flex:0 0 auto;padding:8px 10px;font-size:11px;margin-top:7px;">Count</button>
+          </div>
+          <div class="st" id="s-fr"></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sidebar -->
+
+  <!-- PREVIEW PANEL -->
+  <div id="preview-panel">
+    <div id="preview-toolbar">
+      <span>Live Preview &mdash; click Apply after any change</span>
+      <div class="ptool-right">
+        <div id="device-btns">
+          <button class="dbtn active" onclick="setDevice('desktop',this)">🖥 Desktop</button>
+          <button class="dbtn" onclick="setDevice('mobile',this)">📱 Mobile</button>
+        </div>
+        <button id="refresh-btn" onclick="refreshPreview()">⟳ Refresh</button>
+      </div>
+    </div>
+    <div id="preview-wrap">
+      <div id="preview-scaler" class="desktop">
+        <iframe id="preview-content" id="preview-content" style="height:800px;"></iframe>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /workspace -->
+
+<script>
+// ══════════════════════════════════════════
+//  PASSWORD
+// ══════════════════════════════════════════
+const PASS = 'Rockit2026';
+function checkPw(){
+  const v = document.getElementById('pw-input').value;
+  if(v === PASS){ document.getElementById('auth-wall').style.display='none'; init(); }
+  else { const e=document.getElementById('pw-err'); e.style.display='block'; setTimeout(()=>e.style.display='none',3000); }
+}
+
+// ══════════════════════════════════════════
+//  DATA — ALL EDITABLE CONTENT
+// ══════════════════════════════════════════
+let D = {
+  // colors
+  c_dark:   '#2D0066',
+  c_purple: '#8B00FF',
+  c_yellow: '#FFE500',
+  c_lime:   '#39FF14',
+  c_pink:   '#FF1493',
+  c_orange: '#FF6600',
+  c_red:    '#FF2200',
+  // hero
+  hero_tagline: 'Hauling rock, sand & gravel — with excellence, integrity, and the Lord leading every mile.',
+  hero_location: 'Elizabethtown, Ky',
+  // verses
+  v_hero:       'I can do all things through Christ who strengthens me.',
+  v_hero_ref:   'Philippians 4:13',
+  v_about:      'Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.',
+  v_about_ref:  '— Proverbs 3:5–6',
+  v_faith:      'Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.',
+  v_faith_ref:  '— Colossians 3:23',
+  v_banner:     'But those who hope in the LORD will renew their strength. They will soar on wings like eagles; they will run and not grow weary.',
+  v_banner_ref: '— Isaiah 40:31',
+  v_family:     'As for me and my house, we will serve the LORD.',
+  v_family_ref: '— Joshua 24:15',
+  // about
+  about_p1: "Rockit Trucking Inc. is a family-owned and operated trucking company based right here in Elizabethtown, Kentucky. We were founded on the belief that a business built on God's word will stand the test of time.",
+  about_p2: "Every load we haul — every bag of rock, sand, or gravel — is done with excellence and honor to the Lord. We treat every client like family and every job like it matters, because it does.",
+  // services
+  sv1_title: 'Rock Hauling',
+  sv1_desc: 'From crushed limestone to large decorative boulders, we transport rock safely and efficiently to your jobsite anywhere in the region.',
+  sv2_title: 'Sand Delivery',
+  sv2_desc: 'Need sand for construction, landscaping, or fill? We deliver bulk sand loads to businesses quickly and reliably — the right material, right on time.',
+  sv3_title: 'Gravel Transport',
+  sv3_desc: 'Pea gravel, road base, and drainage gravel — we haul it all. Trusted by contractors and businesses throughout Elizabethtown and surrounding areas.',
+  // reviews
+  r1_text:   '"Have a blessed and SAFE ride!"',
+  r1_author: 'Matthew Antle',
+  r2_text:   '"All done with excellence and honor to the Lord."',
+  r2_author: 'Richard Brady',
+  // family
+  fam_title: 'Family First. Faith Always.',
+  fam_text:  "Rockit Trucking isn't just a business — it's a family. We believe in building lasting relationships with our clients, our community, and our God. When you call Rockit, you're calling family.",
+  // contact
+  phone:    '(270) 737-2825',
+  addr1:    '800 S Park Rd',
+  addr2:    'Elizabethtown, KY 42701',
+  hours:    'Mon – Fri: 8:00 AM – 5:00 PM',
+  weekend:  'Saturday & Sunday: Closed',
+  // careers
+  car_title: 'Drive with Rockit',
+  car_text:  "At Rockit Trucking, our drivers aren't just employees — they're part of the family. We're looking for dedicated, professional, and faith-driven individuals who take pride in their work and want to be part of something bigger than a paycheck.",
+  car_url:   'https://cdlsuite.com/application.php?user_id=675353&theme=default',
+  perk1: 'Faith-centered, family-oriented workplace',
+  perk2: 'Professional, respectful work environment',
+  perk3: 'Well-maintained, top-of-the-line equipment',
+  perk4: 'Based in Elizabethtown, KY',
+  perk5: 'A team that has your back',
+  // footer
+  ftag: 'Serving Elizabethtown, KY and surrounding areas with rock, sand, and gravel hauling — all done with faith, family, and excellence.',
+  copy: '© 2026 Rockit Trucking Inc. · Elizabethtown, KY · All Rights Reserved.',
+};
+
+// ══════════════════════════════════════════
+//  POPULATE FIELDS FROM D
+// ══════════════════════════════════════════
+function init(){
+  const set = (id,val) => { const el=document.getElementById(id); if(el) el.value=val; };
+  set('t-tagline', D.hero_tagline);
+  set('t-location', D.hero_location);
+  set('t-about1', D.about_p1);
+  set('t-about2', D.about_p2);
+  set('t-fam-title', D.fam_title);
+  set('t-fam-text', D.fam_text);
+  set('t-r1-text', D.r1_text);
+  set('t-r1-author', D.r1_author);
+  set('t-r2-text', D.r2_text);
+  set('t-r2-author', D.r2_author);
+  set('t-ftag', D.ftag);
+  set('t-copy', D.copy);
+  set('v-hero', D.v_hero);       set('v-hero-ref', D.v_hero_ref);
+  set('v-about', D.v_about);     set('v-about-ref', D.v_about_ref);
+  set('v-faith', D.v_faith);     set('v-faith-ref', D.v_faith_ref);
+  set('v-banner', D.v_banner);   set('v-banner-ref', D.v_banner_ref);
+  set('v-family', D.v_family);   set('v-family-ref', D.v_family_ref);
+  set('sv1-title', D.sv1_title); set('sv1-desc', D.sv1_desc);
+  set('sv2-title', D.sv2_title); set('sv2-desc', D.sv2_desc);
+  set('sv3-title', D.sv3_title); set('sv3-desc', D.sv3_desc);
+  set('ct-phone', D.phone); set('ct-a1', D.addr1); set('ct-a2', D.addr2);
+  set('ct-hours', D.hours); set('ct-weekend', D.weekend);
+  set('car-title', D.car_title); set('car-text', D.car_text); set('car-url', D.car_url);
+  set('pr1',D.perk1); set('pr2',D.perk2); set('pr3',D.perk3); set('pr4',D.perk4); set('pr5',D.perk5);
+  // colors
+  setColor('c-purple', D.c_purple);
+  setColor('c-dark',   D.c_dark);
+  setColor('c-yellow', D.c_yellow);
+  setColor('c-lime',   D.c_lime);
+  setColor('c-pink',   D.c_pink);
+  setColor('c-orange', D.c_orange);
+  refreshPreview();
+}
+function setColor(id, val){
+  const cp=document.getElementById(id), ch=document.getElementById(id+'-h');
+  if(cp) cp.value=val; if(ch) ch.value=val;
+}
+function sh(cid,hid){ document.getElementById(hid).value=document.getElementById(cid).value; }
+function sp(hid,cid){ const v=document.getElementById(hid).value; if(/^#[0-9A-Fa-f]{6}$/.test(v)) document.getElementById(cid).value=v; }
+
+// ══════════════════════════════════════════
+//  APPLY FUNCTIONS — read fields → update D
+// ══════════════════════════════════════════
+function g(id){ const el=document.getElementById(id); return el?el.value:''; }
+function ok(id){ const el=document.getElementById('s-'+id); if(el){el.className='st ok';el.textContent='✓ Applied!';setTimeout(()=>{el.textContent='';el.className='st';},2200);} }
+
+function apply(section){
+  switch(section){
+    case 'hero':    D.hero_tagline=g('t-tagline'); D.hero_location=g('t-location'); break;
+    case 'about':   D.about_p1=g('t-about1'); D.about_p2=g('t-about2'); break;
+    case 'family':  D.fam_title=g('t-fam-title'); D.fam_text=g('t-fam-text'); break;
+    case 'reviews': D.r1_text=g('t-r1-text'); D.r1_author=g('t-r1-author'); D.r2_text=g('t-r2-text'); D.r2_author=g('t-r2-author'); break;
+    case 'footer':  D.ftag=g('t-ftag'); D.copy=g('t-copy'); break;
+    case 'colors':
+      D.c_purple=g('c-purple'); D.c_dark=g('c-dark');
+      D.c_yellow=g('c-yellow'); D.c_lime=g('c-lime');
+      D.c_pink=g('c-pink');     D.c_orange=g('c-orange');
+      break;
+    case 'vhero':   D.v_hero=g('v-hero'); D.v_hero_ref=g('v-hero-ref'); break;
+    case 'vabout':  D.v_about=g('v-about'); D.v_about_ref=g('v-about-ref'); break;
+    case 'vfaith':  D.v_faith=g('v-faith'); D.v_faith_ref=g('v-faith-ref'); break;
+    case 'vbanner': D.v_banner=g('v-banner'); D.v_banner_ref=g('v-banner-ref'); break;
+    case 'vfamily': D.v_family=g('v-family'); D.v_family_ref=g('v-family-ref'); break;
+    case 'services':
+      D.sv1_title=g('sv1-title'); D.sv1_desc=g('sv1-desc');
+      D.sv2_title=g('sv2-title'); D.sv2_desc=g('sv2-desc');
+      D.sv3_title=g('sv3-title'); D.sv3_desc=g('sv3-desc');
+      break;
+    case 'contact':
+      D.phone=g('ct-phone'); D.addr1=g('ct-a1'); D.addr2=g('ct-a2');
+      D.hours=g('ct-hours'); D.weekend=g('ct-weekend');
+      break;
+    case 'careers':
+      D.car_title=g('car-title'); D.car_text=g('car-text'); D.car_url=g('car-url');
+      D.perk1=g('pr1'); D.perk2=g('pr2'); D.perk3=g('pr3'); D.perk4=g('pr4'); D.perk5=g('pr5');
+      break;
+  }
+  refreshPreview();
+  ok(section);
+}
+
+// ══════════════════════════════════════════
+//  BUILD HTML — full Rockit site from D
+// ══════════════════════════════════════════
+function e(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function buildHTML(){
+  const stripe = `height:10px;background:linear-gradient(90deg,${D.c_lime} 0%,${D.c_lime} 12%,${D.c_red||'#FF2200'} 12%,${D.c_red||'#FF2200'} 22%,${D.c_orange} 22%,${D.c_orange} 32%,${D.c_pink} 32%,${D.c_pink} 42%,${D.c_yellow} 42%,${D.c_yellow} 52%,${D.c_pink} 52%,${D.c_pink} 62%,${D.c_orange} 62%,${D.c_orange} 72%,${D.c_red||'#FF2200'} 72%,${D.c_red||'#FF2200'} 82%,${D.c_lime} 82%,${D.c_lime} 100%`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Rockit Trucking Inc – Elizabethtown, KY</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Open Sans',sans-serif;color:#1a0033;background:#fff;overflow-x:hidden;}
+:root{
+  --purple:${D.c_purple};--purple-bg:${D.c_purple};--purple-dark:${D.c_dark};
+  --yellow:${D.c_yellow};--lime:${D.c_lime};--pink:${D.c_pink};
+  --orange:${D.c_orange};--red:#FF2200;--white:#ffffff;--light:#f5eeff;
+}
+.stripe-bar{${stripe};}
+.stripe-bar-thin{height:5px;${stripe};}
+nav{position:sticky;top:0;z-index:999;background:var(--purple-dark);display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:70px;box-shadow:0 2px 20px rgba(0,0,0,.5);border-bottom:3px solid var(--yellow);}
+.nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+.nav-logo img{height:50px;width:50px;object-fit:contain;border-radius:8px;}
+.nav-logo-text{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.3rem;color:var(--yellow);letter-spacing:.05em;text-transform:uppercase;}
+.nav-logo-text span{color:var(--lime);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{text-decoration:none;color:rgba(255,255,255,.8);font-family:'Montserrat',sans-serif;font-weight:600;font-size:.88rem;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--yellow);}
+.nav-cta{background:var(--yellow)!important;color:var(--purple-dark)!important;padding:.45rem 1.2rem;border-radius:50px;font-weight:700!important;}
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:var(--purple);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(139,0,255,.8) 0%,transparent 55%),radial-gradient(ellipse at 80% 70%,rgba(57,255,20,.15) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(45,0,102,.6) 0%,transparent 70%);z-index:0;}
+.hero-stripes{position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent 0px,transparent 18px,rgba(255,229,0,.03) 18px,rgba(255,229,0,.03) 20px);z-index:0;pointer-events:none;}
+.hero-content{position:relative;z-index:1;max-width:900px;padding:2rem 1.5rem;}
+.hero-badge{display:inline-block;background:var(--yellow);color:var(--purple-dark);font-family:'Montserrat',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;padding:.4rem 1.2rem;border-radius:50px;margin-bottom:1.5rem;}
+.hero-logo-wrap{width:180px;height:180px;margin:0 auto 1.5rem;border-radius:24px;overflow:hidden;box-shadow:0 0 0 4px var(--yellow),0 0 0 8px var(--lime),0 20px 60px rgba(0,0,0,.5);}
+.hero-logo-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero h1{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(3rem,7vw,6rem);line-height:1;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem;}
+.hero h1 .rockit{color:var(--yellow);text-shadow:0 0 30px rgba(255,229,0,.6);}
+.hero h1 .trucking{color:#fff;}
+.hero-location{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:var(--lime);margin-bottom:1.5rem;text-shadow:0 0 15px rgba(57,255,20,.4);}
+.hero-tagline{color:rgba(255,255,255,.85);font-size:1.1rem;max-width:580px;margin:0 auto 1.5rem;line-height:1.7;}
+.hero-verse{background:rgba(45,0,102,.6);border:1px solid rgba(255,229,0,.3);border-left:4px solid var(--yellow);backdrop-filter:blur(8px);border-radius:14px;padding:1rem 1.5rem;margin:0 auto 2rem;max-width:560px;}
+.hero-verse p{font-family:'Playfair Display',serif;font-style:italic;color:#fff;font-size:1.05rem;line-height:1.6;}
+.hero-verse cite{display:block;font-family:'Montserrat',sans-serif;font-style:normal;font-weight:700;font-size:.75rem;color:var(--yellow);letter-spacing:.12em;text-transform:uppercase;margin-top:.4rem;}
+.hero-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:1rem;padding:.85rem 2rem;border-radius:50px;text-decoration:none;transition:transform .2s,box-shadow .2s;cursor:pointer;border:none;}
+.btn:hover{transform:translateY(-3px);}
+.btn-primary{background:var(--yellow);color:var(--purple-dark);box-shadow:0 6px 30px rgba(255,229,0,.5);}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5);}
+.ticker-wrap{background:var(--purple-dark);border-top:3px solid var(--lime);border-bottom:3px solid var(--lime);overflow:hidden;padding:.65rem 0;}
+.ticker-content{display:flex;gap:4rem;white-space:nowrap;animation:ticker 30s linear infinite;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);}
+.ticker-item::before{content:"✦ ";color:var(--lime);}
+section{padding:5rem 1.5rem;}
+.container{max-width:1100px;margin:0 auto;}
+.section-label{display:inline-block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;padding:.35rem 1rem;border-radius:50px;margin-bottom:1rem;}
+.section-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(2rem,4vw,2.8rem);line-height:1.1;text-transform:uppercase;margin-bottom:1rem;}
+.section-sub{font-size:1.05rem;color:#555;max-width:600px;line-height:1.7;}
+.about{background:var(--light);}
+.about-label{background:rgba(139,0,255,.12);color:var(--purple);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.about-title{color:var(--purple-dark);}
+.about-title span{color:var(--purple);}
+.about-text{font-size:1.05rem;color:#444;line-height:1.8;margin-bottom:1.2rem;}
+.about-stats{display:flex;gap:2.5rem;flex-wrap:wrap;margin-top:.5rem;}
+.stat-num{font-family:'Montserrat',sans-serif;font-weight:900;font-size:2rem;color:var(--purple);}
+.stat-label{font-size:.8rem;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.about-card{background:var(--purple);border-radius:24px;padding:2.5rem;position:relative;overflow:hidden;}
+.about-card::before{content:'';position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,var(--lime),var(--yellow),var(--pink),var(--orange));}
+.about-card-icon{font-size:3rem;margin-bottom:1rem;}
+.about-card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.2rem;color:var(--yellow);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.04em;}
+.about-card-verse{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:rgba(255,255,255,.9);line-height:1.7;border-left:3px solid var(--lime);padding-left:1rem;margin-bottom:.6rem;}
+.about-card-cite{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;color:var(--lime);letter-spacing:.12em;text-transform:uppercase;}
+.services{background:#fff;}
+.services-label{background:rgba(255,229,0,.15);color:#7a6800;}
+.services-title{color:var(--purple-dark);}
+.services-title span{color:var(--purple);}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.service-card{background:#fff;border-radius:20px;padding:2rem;border:2px solid #eee;transition:transform .25s,border-color .25s,box-shadow .25s;text-align:center;position:relative;overflow:hidden;}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.service-card-1::before{background:linear-gradient(90deg,var(--yellow),var(--orange));}
+.service-card-2::before{background:linear-gradient(90deg,var(--purple),var(--pink));}
+.service-card-3::before{background:linear-gradient(90deg,var(--lime),var(--yellow));}
+.service-card:hover{transform:translateY(-6px);box-shadow:0 15px 40px rgba(139,0,255,.12);border-color:var(--purple);}
+.service-icon-wrap{width:70px;height:70px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.25rem;}
+.service-card-1 .service-icon-wrap{background:linear-gradient(135deg,var(--yellow),var(--orange));}
+.service-card-2 .service-icon-wrap{background:linear-gradient(135deg,var(--purple),var(--pink));}
+.service-card-3 .service-icon-wrap{background:linear-gradient(135deg,var(--lime),#00cc00);}
+.service-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:var(--purple-dark);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.03em;}
+.service-desc{font-size:.95rem;color:#666;line-height:1.65;}
+.fleet{background:var(--purple-dark);padding:5rem 1.5rem;}
+.fleet-label{background:rgba(255,229,0,.15);color:var(--yellow);}
+.fleet-title{color:var(--yellow);}
+.fleet-title span{color:var(--lime);}
+.fleet-subtitle{color:rgba(255,255,255,.65);}
+.fleet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:3rem;}
+.fleet-item{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/3;background:#1a0044;border:2px solid rgba(255,229,0,.2);transition:border-color .3s;}
+.fleet-item:hover{border-color:var(--yellow);}
+.fleet-item.large{grid-column:span 2;aspect-ratio:16/7;}
+.fleet-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease;}
+.fleet-item:hover img{transform:scale(1.04);}
+.fleet-item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(45,0,102,.75) 0%,transparent 50%);display:flex;align-items:flex-end;padding:1.2rem 1.5rem;opacity:0;transition:opacity .3s;}
+.fleet-item:hover .fleet-item-overlay{opacity:1;}
+.fleet-item-label{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;color:var(--yellow);letter-spacing:.06em;text-transform:uppercase;}
+.faith{background:var(--purple);position:relative;overflow:hidden;}
+.faith::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(255,229,0,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(57,255,20,.08) 0%,transparent 55%);}
+.faith .container{position:relative;z-index:1;}
+.faith-label{background:rgba(255,229,0,.15);color:var(--yellow);}
+.faith-title{color:var(--yellow);}
+.faith-title span{color:var(--lime);}
+.faith-subtitle{color:rgba(255,255,255,.7);}
+.faith-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.faith-card{background:rgba(45,0,102,.5);border:1px solid rgba(255,229,0,.2);border-radius:20px;padding:2rem;backdrop-filter:blur(8px);transition:background .25s,border-color .25s;}
+.faith-card:hover{background:rgba(45,0,102,.7);border-color:var(--yellow);}
+.faith-card-icon{font-size:2.2rem;margin-bottom:1rem;}
+.faith-card-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1rem;color:var(--yellow);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.04em;}
+.faith-card-text{font-size:.95rem;color:rgba(255,255,255,.75);line-height:1.65;}
+.faith-verse-block{margin-top:3.5rem;text-align:center;background:rgba(45,0,102,.5);border:1px solid rgba(255,229,0,.25);border-top:4px solid var(--lime);border-radius:20px;padding:2.5rem;}
+.faith-verse-block p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.5rem;color:#fff;line-height:1.6;max-width:700px;margin:0 auto 1rem;}
+.faith-verse-block cite{font-family:'Montserrat',sans-serif;font-style:normal;font-weight:700;font-size:.82rem;color:var(--lime);letter-spacing:.14em;text-transform:uppercase;}
+.verse-banner{background:var(--yellow);padding:3.5rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.verse-banner p{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.3rem,3vw,2rem);color:var(--purple-dark);line-height:1.6;max-width:750px;margin:0 auto 1rem;}
+.verse-banner cite{font-family:'Montserrat',sans-serif;font-style:normal;font-weight:700;font-size:.88rem;color:var(--purple);letter-spacing:.12em;text-transform:uppercase;}
+.testimonials{background:var(--light);}
+.testimonials-label{background:rgba(139,0,255,.12);color:var(--purple);}
+.testimonials-title{color:var(--purple-dark);}
+.testimonials-title span{color:var(--purple);}
+.testimonials-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;}
+.review-card{background:#fff;border-radius:20px;padding:2rem;box-shadow:0 5px 25px rgba(139,0,255,.1);position:relative;overflow:hidden;border:1px solid rgba(139,0,255,.08);}
+.review-card::before{content:'"';position:absolute;top:-10px;right:20px;font-family:'Playfair Display',serif;font-size:8rem;color:rgba(139,0,255,.05);line-height:1;}
+.review-card-bar{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--purple),var(--pink),var(--yellow));}
+.review-stars{display:flex;gap:.2rem;margin-bottom:.75rem;}
+.star{color:var(--yellow);font-size:1.2rem;}
+.review-text{font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;color:#333;line-height:1.7;margin-bottom:1rem;}
+.review-author{display:flex;align-items:center;gap:.75rem;}
+.review-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;color:#fff;font-size:1rem;}
+.avatar-1{background:linear-gradient(135deg,var(--purple),var(--pink));}
+.avatar-2{background:linear-gradient(135deg,var(--purple-dark),var(--purple));}
+.review-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.95rem;color:var(--purple-dark);}
+.review-source{font-size:.78rem;color:#999;margin-top:.15rem;}
+.google-reviews-btn{display:inline-flex;align-items:center;gap:.75rem;margin-top:2.5rem;padding:.85rem 2rem;background:#fff;border:2px solid #dadce0;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:600;font-size:1rem;color:#3c4043;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.08);transition:box-shadow .2s,transform .2s,border-color .2s;}
+.google-reviews-btn:hover{box-shadow:0 6px 24px rgba(0,0,0,.15);transform:translateY(-2px);border-color:#aaa;}
+.google-g-icon{width:22px;height:22px;flex-shrink:0;}
+.reviews-cta-row{text-align:center;margin-top:1rem;}
+.family-section{background:#fff;padding:5rem 1.5rem;}
+.family-inner{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 50%,var(--purple-bg) 100%);border-radius:30px;padding:4rem 3rem;text-align:center;position:relative;overflow:hidden;max-width:1100px;margin:0 auto;border:3px solid var(--yellow);}
+.family-content{position:relative;z-index:1;}
+.family-emoji{font-size:3.5rem;margin-bottom:1rem;}
+.family-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--yellow);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.03em;}
+.family-text{color:rgba(255,255,255,.85);font-size:1.05rem;max-width:650px;margin:0 auto 2rem;line-height:1.8;}
+.family-verse{background:rgba(255,229,0,.12);border:1px solid rgba(255,229,0,.3);border-radius:16px;padding:1.5rem 2rem;max-width:580px;margin:0 auto;}
+.family-verse p{font-family:'Playfair Display',serif;font-style:italic;color:#fff;font-size:1.05rem;line-height:1.6;margin-bottom:.4rem;}
+.family-verse cite{font-family:'Montserrat',sans-serif;font-style:normal;font-weight:700;font-size:.72rem;color:var(--yellow);letter-spacing:.1em;text-transform:uppercase;}
+.careers{background:var(--purple-dark);padding:5rem 1.5rem;}
+.careers-label{background:rgba(57,255,20,.12);color:var(--lime);}
+.careers-title{color:var(--yellow);}
+.careers-title span{color:var(--lime);}
+.careers-inner{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:3rem;align-items:center;}
+.careers-text{color:rgba(255,255,255,.8);font-size:1.05rem;line-height:1.8;margin-bottom:1.5rem;}
+.careers-perks{display:flex;flex-direction:column;gap:.85rem;margin-bottom:2rem;}
+.careers-perk{display:flex;align-items:center;gap:.75rem;color:rgba(255,255,255,.85);font-size:.98rem;}
+.perk-icon{width:36px;height:36px;background:rgba(255,229,0,.12);border:1px solid rgba(255,229,0,.25);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.btn-apply{display:inline-flex;align-items:center;gap:.6rem;background:var(--lime);color:var(--purple-dark);font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.1rem;padding:1rem 2.5rem;border-radius:50px;text-decoration:none;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 8px 30px rgba(57,255,20,.4);transition:transform .2s,box-shadow .2s;}
+.btn-apply:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(57,255,20,.6);}
+.careers-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,229,0,.2);border-radius:24px;padding:2.5rem;position:relative;overflow:hidden;}
+.careers-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--lime),var(--yellow));}
+.careers-card-icon{font-size:3rem;margin-bottom:1rem;}
+.careers-card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.3rem;color:var(--yellow);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em;}
+.careers-card-text{color:rgba(255,255,255,.75);font-size:.98rem;line-height:1.7;margin-bottom:1.5rem;}
+.careers-card-note{font-family:'Playfair Display',serif;font-style:italic;color:var(--lime);font-size:.92rem;border-left:3px solid var(--lime);padding-left:1rem;line-height:1.6;}
+.contact{background:var(--light);}
+.contact-label{background:rgba(255,229,0,.15);color:#7a6800;}
+.contact-title{color:var(--purple-dark);}
+.contact-title span{color:var(--purple);}
+.contact-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:3rem;margin-top:3rem;}
+.contact-info-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.2rem;color:var(--purple-dark);margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.03em;}
+.contact-item{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.5rem;}
+.contact-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.ci-1{background:linear-gradient(135deg,var(--yellow),var(--orange));}
+.ci-2{background:linear-gradient(135deg,var(--purple),var(--pink));}
+.ci-3{background:linear-gradient(135deg,var(--lime),#00aa00);}
+.contact-item-label{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:.2rem;}
+.contact-item-value{font-size:1rem;color:var(--purple-dark);font-weight:600;}
+.contact-item-value a{color:var(--purple-dark);text-decoration:none;}
+.contact-form{background:#fff;border-radius:20px;padding:2.5rem;box-shadow:0 10px 40px rgba(139,0,255,.1);border:1px solid rgba(139,0,255,.08);position:relative;}
+footer{background:var(--purple-dark);padding:3rem 1.5rem 1.5rem;border-top:3px solid var(--yellow);}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;max-width:1100px;margin:0 auto;padding-bottom:2rem;border-bottom:1px solid rgba(255,229,0,.15);}
+.footer-logo-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;}
+.footer-logo-img{width:48px;height:48px;border-radius:8px;object-fit:cover;}
+.footer-brand-name{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.3rem;color:var(--yellow);text-transform:uppercase;}
+.footer-tagline{color:rgba(255,255,255,.5);font-size:.9rem;line-height:1.6;margin-bottom:1.2rem;}
+.footer-verse{font-family:'Playfair Display',serif;font-style:italic;color:rgba(255,255,255,.55);font-size:.88rem;line-height:1.6;border-left:3px solid var(--yellow);padding-left:1rem;}
+.footer-verse cite{display:block;font-family:'Montserrat',sans-serif;font-style:normal;font-weight:700;font-size:.68rem;color:var(--yellow);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;}
+.footer-col-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);margin-bottom:1rem;}
+.footer-links{list-style:none;}
+.footer-links li{margin-bottom:.6rem;color:rgba(255,255,255,.6);font-size:.9rem;}
+.footer-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.9rem;transition:color .2s;}
+.footer-links a:hover{color:var(--yellow);}
+.footer-bottom{max-width:1100px;margin:1.5rem auto 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;}
+.footer-copy{color:rgba(255,255,255,.3);font-size:.8rem;}
+.footer-faith-note{color:rgba(255,229,0,.6);font-size:.82rem;font-family:'Playfair Display',serif;font-style:italic;}
+@media(max-width:900px){.about-grid,.contact-grid,.careers-inner{grid-template-columns:1fr;}.services-grid,.faith-cards{grid-template-columns:1fr 1fr;}.testimonials-grid{grid-template-columns:1fr;}.footer-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.nav-links{display:none;}.services-grid,.faith-cards{grid-template-columns:1fr;}.footer-grid{grid-template-columns:1fr;}.fleet-item.large{grid-column:span 1;aspect-ratio:4/3;}}
+</style>
+</head>
+<body>
+<div class="stripe-bar"></div>
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="images/logo.png" alt="Rockit Trucking Logo" onerror="this.style.display='none'"/>
+    <span class="nav-logo-text">Rockit <span>Trucking</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#fleet">Our Fleet</a></li>
+    <li><a href="#faith">Our Faith</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#careers">Careers</a></li>
+    <li><a href="#contact" class="nav-cta">Get a Quote</a></li>
+  </ul>
+</nav>
+<section class="hero" id="home">
+  <div class="hero-bg"></div><div class="hero-stripes"></div>
+  <div class="hero-content">
+    <div class="hero-badge">✝ Faith · Family · Elizabethtown, KY</div>
+    <div class="hero-logo-wrap"><img src="images/logo.png" alt="Rockit Trucking Inc Logo"/></div>
+    <h1><span class="rockit">Rockit</span><br/><span class="trucking">Trucking Inc.</span></h1>
+    <p class="hero-location">${e(D.hero_location)}</p>
+    <p class="hero-tagline">${e(D.hero_tagline)}</p>
+    <div class="hero-verse"><p>"${e(D.v_hero)}"</p><cite>${e(D.v_hero_ref)}</cite></div>
+    <div class="hero-buttons">
+      <a href="#contact" class="btn btn-primary">Get a Free Quote</a>
+      <a href="tel:+1${D.phone.replace(/\D/g,'')}" class="btn btn-outline">📞 ${e(D.phone)}</a>
+    </div>
+  </div>
+</section>
+<div class="stripe-bar"></div>
+<div class="ticker-wrap"><div class="ticker-content">
+  <span class="ticker-item">Rock Hauling</span><span class="ticker-item">Sand &amp; Gravel Delivery</span>
+  <span class="ticker-item">Elizabethtown, KY</span><span class="ticker-item">Family Owned</span>
+  <span class="ticker-item">Faith Driven</span><span class="ticker-item">Professional Service</span>
+  <span class="ticker-item">Honor to the Lord</span><span class="ticker-item">Peterbilt Proud</span>
+  <span class="ticker-item">Rock Hauling</span><span class="ticker-item">Sand &amp; Gravel Delivery</span>
+  <span class="ticker-item">Elizabethtown, KY</span><span class="ticker-item">Family Owned</span>
+  <span class="ticker-item">Faith Driven</span><span class="ticker-item">Professional Service</span>
+  <span class="ticker-item">Honor to the Lord</span><span class="ticker-item">Peterbilt Proud</span>
+</div></div>
+<section class="about" id="about">
+  <div class="container"><div class="about-grid">
+    <div>
+      <span class="section-label about-label">About Us</span>
+      <h2 class="section-title about-title">Built on <span>Faith</span>,<br/>Driven by Purpose</h2>
+      <p class="about-text">${e(D.about_p1)}</p>
+      <p class="about-text">${e(D.about_p2)}</p>
+      <div class="about-stats">
+        <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Faith-Driven</div></div>
+        <div class="stat"><div class="stat-num">KY</div><div class="stat-label">Local &amp; Proud</div></div>
+        <div class="stat"><div class="stat-num">KY &amp; Beyond</div><div class="stat-label">Service Area</div></div>
+      </div>
+    </div>
+    <div><div class="about-card">
+      <div class="about-card-icon">✝️</div>
+      <div class="about-card-title">Our Mission &amp; Heart</div>
+      <p class="about-card-verse">"${e(D.v_about)}"</p>
+      <div class="about-card-cite">${e(D.v_about_ref)}</div>
+    </div></div>
+  </div></div>
+</section>
+<section class="services" id="services">
+  <div class="container">
+    <span class="section-label services-label">What We Do</span>
+    <h2 class="section-title services-title">Our <span>Services</span></h2>
+    <p class="section-sub">We specialize in hauling the materials that build communities. Whether it's a small project or a large commercial contract, we deliver on time and with care.</p>
+    <div class="services-grid">
+      <div class="service-card service-card-1"><div class="service-icon-wrap">🪨</div><div class="service-title">${e(D.sv1_title)}</div><p class="service-desc">${e(D.sv1_desc)}</p></div>
+      <div class="service-card service-card-2"><div class="service-icon-wrap">⏳</div><div class="service-title">${e(D.sv2_title)}</div><p class="service-desc">${e(D.sv2_desc)}</p></div>
+      <div class="service-card service-card-3"><div class="service-icon-wrap">🏗️</div><div class="service-title">${e(D.sv3_title)}</div><p class="service-desc">${e(D.sv3_desc)}</p></div>
+    </div>
+  </div>
+</section>
+<div class="stripe-bar"></div>
+<section class="fleet" id="fleet">
+  <div class="container">
+    <span class="section-label fleet-label">Our Fleet</span>
+    <h2 class="section-title fleet-title">The <span>Rockit</span> Fleet</h2>
+    <p class="section-sub fleet-subtitle">These aren't just trucks — they're rolling testaments to pride, craftsmanship, and the Rockit spirit.</p>
+    <div class="fleet-grid">
+      <div class="fleet-item large"><img src="images/truck1.jpg" alt="RC-107"/><div class="fleet-item-overlay"><span class="fleet-item-label">RC-107 · The Blue Bomber</span></div></div>
+      <div class="fleet-item"><img src="images/truck2.jpg" alt="MT-1128"/><div class="fleet-item-overlay"><span class="fleet-item-label">MT-1128 · The Green Machine</span></div></div>
+      <div class="fleet-item"><img src="images/truck3.jpg" alt="Fleet"/><div class="fleet-item-overlay"><span class="fleet-item-label">The Full Fleet</span></div></div>
+      <div class="fleet-item large"><img src="images/truck4.jpg" alt="Fleet autumn"/><div class="fleet-item-overlay"><span class="fleet-item-label">Rockit's Finest · Elizabethtown, KY</span></div></div>
+    </div>
+  </div>
+</section>
+<div class="stripe-bar"></div>
+<section class="faith" id="faith">
+  <div class="container">
+    <span class="section-label faith-label">Our Foundation</span>
+    <h2 class="section-title faith-title">Jesus Is at the <span>Center</span></h2>
+    <p class="section-sub faith-subtitle">Our faith isn't just a part of who we are — it IS who we are. We run every mile, every route, and every relationship with Christ leading the way.</p>
+    <div class="faith-cards">
+      <div class="faith-card"><div class="faith-card-icon">🙏</div><div class="faith-card-title">Prayer on Every Haul</div><p class="faith-card-text">We ask for God's protection and guidance on every load, every driver, and every destination. His hand guides us on the road.</p></div>
+      <div class="faith-card"><div class="faith-card-icon">❤️</div><div class="faith-card-title">Serving with Love</div><p class="faith-card-text">We treat every customer the way we want to be treated — with kindness, honesty, and genuine care. That's the Golden Rule in action.</p></div>
+      <div class="faith-card"><div class="faith-card-icon">✨</div><div class="faith-card-title">Excellence as Worship</div><p class="faith-card-text">We believe doing your best work IS worship. Every delivery, every interaction is an opportunity to honor the Lord through our actions.</p></div>
+    </div>
+    <div class="faith-verse-block">
+      <p>"${e(D.v_faith)}"</p>
+      <cite>${e(D.v_faith_ref)}</cite>
+    </div>
+  </div>
+</section>
+<div class="verse-banner">
+  <p>"${e(D.v_banner)}"</p>
+  <cite>${e(D.v_banner_ref)}</cite>
+</div>
+<section class="testimonials" id="reviews">
+  <div class="container">
+    <span class="section-label testimonials-label">Reviews</span>
+    <h2 class="section-title testimonials-title">What People Are <span>Saying</span></h2>
+    <p class="section-sub">We're grateful for every kind word. These are real reviews from real people who experienced the Rockit Trucking difference.</p>
+    <div class="testimonials-grid">
+      <div class="review-card"><div class="review-card-bar"></div>
+        <div class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="review-text">${e(D.r1_text)}</p>
+        <div class="review-author"><div class="review-avatar avatar-1">${e(D.r1_author.split(' ').map(w=>w[0]).join('').slice(0,2))}</div>
+          <div><div class="review-name">${e(D.r1_author)}</div><div class="review-source">Google Review</div></div></div>
+      </div>
+      <div class="review-card"><div class="review-card-bar"></div>
+        <div class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="review-text">${e(D.r2_text)}</p>
+        <div class="review-author"><div class="review-avatar avatar-2">${e(D.r2_author.split(' ').map(w=>w[0]).join('').slice(0,2))}</div>
+          <div><div class="review-name">${e(D.r2_author)}</div><div class="review-source">Google Review</div></div></div>
+      </div>
+    </div>
+    <div class="reviews-cta-row">
+      <a href="https://www.google.com/search?q=Rockit+Trucking+Inc+Elizabethtown+KY+reviews" target="_blank" class="google-reviews-btn">
+        <svg class="google-g-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        See all reviews on Google
+      </a>
+    </div>
+  </div>
+</section>
+<section class="family-section">
+  <div class="family-inner"><div class="family-content">
+    <div class="family-emoji">👨‍👩‍👧‍👦</div>
+    <h2 class="family-title">${e(D.fam_title)}</h2>
+    <p class="family-text">${e(D.fam_text)}</p>
+    <div class="family-verse"><p>"${e(D.v_family)}"</p><cite>${e(D.v_family_ref)}</cite></div>
+  </div></div>
+</section>
+<div class="stripe-bar"></div>
+<section class="careers" id="careers">
+  <div class="container">
+    <span class="section-label careers-label">Now Hiring</span>
+    <h2 class="section-title careers-title">${e(D.car_title)}</h2>
+    <p class="section-sub" style="color:rgba(255,255,255,.65);">Looking for more than just a job? Join a team where faith, family, and hard work are celebrated every single day.</p>
+    <div class="careers-inner">
+      <div>
+        <p class="careers-text">${e(D.car_text)}</p>
+        <div class="careers-perks">
+          <div class="careers-perk"><div class="perk-icon">✝️</div>${e(D.perk1)}</div>
+          <div class="careers-perk"><div class="perk-icon">💼</div>${e(D.perk2)}</div>
+          <div class="careers-perk"><div class="perk-icon">🚛</div>${e(D.perk3)}</div>
+          <div class="careers-perk"><div class="perk-icon">📍</div>${e(D.perk4)}</div>
+          <div class="careers-perk"><div class="perk-icon">🤝</div>${e(D.perk5)}</div>
+        </div>
+        <a href="${D.car_url}" target="_blank" class="btn-apply">🚀 Apply Here!</a>
+      </div>
+      <div class="careers-card">
+        <div class="careers-card-icon">🏆</div>
+        <div class="careers-card-title">Ready to Join the Team?</div>
+        <p class="careers-card-text">Our online application takes just a few minutes. Click the button and take the first step toward a career with one of Kentucky's most respected trucking companies.</p>
+        <div class="careers-card-note">"Whatever you do, work at it with all your heart, as working for the Lord."<br/><strong style="font-style:normal;font-family:'Montserrat',sans-serif;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;">— Colossians 3:23</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="contact" id="contact">
+  <div class="container">
+    <span class="section-label contact-label">Contact Us</span>
+    <h2 class="section-title contact-title">Come See Us &amp; Get Your <span>Free Quote</span></h2>
+    <p class="section-sub">We believe great business starts with a handshake. Stop by our location in Elizabethtown or give us a call — our team is ready to sit down with you, discuss your project, and put together a free, no-obligation quote in person.</p>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info-title">Reach Us Directly</div>
+        <div class="contact-item"><div class="contact-icon ci-1">📞</div><div><div class="contact-item-label">Phone</div><div class="contact-item-value"><a href="tel:+1${D.phone.replace(/\D/g,'')}">${e(D.phone)}</a></div></div></div>
+        <div class="contact-item"><div class="contact-icon ci-2">📍</div><div><div class="contact-item-label">Address</div><div class="contact-item-value">${e(D.addr1)},<br/>${e(D.addr2)}</div></div></div>
+        <div class="contact-item"><div class="contact-icon ci-3">🕗</div><div><div class="contact-item-label">Office Hours</div><div class="contact-item-value">${e(D.hours)}<br/><span style="font-size:.88rem;color:#888;">${e(D.weekend)}</span></div></div></div>
+        <div class="contact-item"><div class="contact-icon ci-1">🚛</div><div><div class="contact-item-label">Service Area</div><div class="contact-item-value">Elizabethtown &amp; Surrounding Kentucky Areas</div></div></div>
+        <br/><a href="tel:+1${D.phone.replace(/\D/g,'')}" class="btn btn-primary">📞 Call Now</a>
+      </div>
+      <div class="contact-form" style="position:relative;">
+        <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,${D.c_lime},${D.c_yellow},${D.c_pink},${D.c_purple});border-radius:20px 20px 0 0;"></div>
+        <div style="text-align:center;padding:1rem 0 .5rem;"><div style="font-size:3.5rem;margin-bottom:.75rem;">🤝</div><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.5rem;color:var(--purple-dark);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1.5rem;">Your Free Quote Awaits</div></div>
+        <p style="text-align:center;color:#555;font-size:.98rem;line-height:1.7;margin-bottom:1.8rem;">We don't do quotes online — because we believe <strong style="color:var(--purple);">your project deserves a real conversation.</strong> Come visit us in Elizabethtown and let's talk about exactly what you need.</p>
+        <div style="background:var(--light);border-radius:14px;padding:1.4rem 1.6rem;margin-bottom:1.5rem;border:1px solid rgba(139,0,255,.1);">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">📍</span><div><div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:.15rem;">Visit Us At</div><div style="font-weight:600;color:var(--purple-dark);font-size:.98rem;">${e(D.addr1)}, ${e(D.addr2)}</div></div></div>
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem;"><span style="font-size:1.4rem;">📞</span><div><div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:.15rem;">Call Ahead</div><a href="tel:+1${D.phone.replace(/\D/g,'')}" style="font-weight:600;color:var(--purple-dark);font-size:.98rem;text-decoration:none;">${e(D.phone)}</a></div></div>
+          <div style="display:flex;align-items:center;gap:.75rem;"><span style="font-size:1.4rem;">🕗</span><div><div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:.15rem;">Office Hours</div><div style="font-weight:600;color:var(--purple-dark);font-size:.98rem;">${e(D.hours)}</div></div></div>
+        </div>
+        <a href="https://maps.google.com/?q=${encodeURIComponent(D.addr1+' '+D.addr2)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:1rem;background:linear-gradient(90deg,${D.c_purple},${D.c_pink});color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:1rem;text-decoration:none;text-transform:uppercase;letter-spacing:.06em;">📍 Get Directions</a>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="stripe-bar"></div>
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo-row"><img src="images/logo.png" alt="Rockit Trucking Logo" class="footer-logo-img" onerror="this.style.display='none'"/><div class="footer-brand-name">Rockit Trucking Inc.</div></div>
+      <p class="footer-tagline">${e(D.ftag)}</p>
+      <div class="footer-verse">"Have a blessed and SAFE ride!"<cite>— Matthew Antle, 5-Star Review</cite></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Quick Links</div>
+      <ul class="footer-links"><li><a href="#home">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#services">Services</a></li><li><a href="#fleet">Our Fleet</a></li><li><a href="#faith">Our Faith</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#careers">Careers</a></li><li><a href="#contact">Contact</a></li></ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links"><li><a href="tel:+1${D.phone.replace(/\D/g,'')}">${e(D.phone)}</a></li><li>${e(D.addr1)}</li><li>${e(D.addr2)}</li></ul>
+      <br/><div class="footer-col-title">Hours</div>
+      <ul class="footer-links"><li>${e(D.hours)}</li><li>${e(D.weekend)}</li><li>Serving Kentucky &amp; Beyond</li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">${e(D.copy)}</span>
+    <span class="footer-faith-note">✝ "All done with excellence and honor to the Lord."</span>
+  </div>
+</footer>
+</body></html>`;
+}
+
+// ══════════════════════════════════════════
+//  PREVIEW
+// ══════════════════════════════════════════
+function refreshPreview(){
+  const html = buildHTML();
+  const iframe = document.getElementById('preview-content');
+  iframe.srcdoc = html;
+  // Auto-height after load
+  iframe.onload = () => {
+    try{
+      const h = iframe.contentDocument.documentElement.scrollHeight;
+      iframe.style.height = Math.max(h, 800) + 'px';
+    }catch(e){}
+  };
+}
+
+function setDevice(mode, btn){
+  document.getElementById('preview-scaler').className = mode;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  refreshPreview();
+}
+
+function openNewTab(){
+  const html = buildHTML();
+  const w = window.open('','_blank');
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+function downloadSite(){
+  const html = buildHTML();
+  const a = document.createElement('a');
+  a.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(html));
+  a.setAttribute('download', 'index.html');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ══════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════
+function switchTab(name, btn){
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+//  FIND & REPLACE
+// ══════════════════════════════════════════
+function countM(){
+  const f = document.getElementById('fr-f').value;
+  const el = document.getElementById('fc');
+  if(!f){el.textContent='';return;}
+  const html = buildHTML();
+  const count = (html.split(f).length-1);
+  el.textContent = count ? count+' match'+(count>1?'es':'') : 'No matches';
+  document.getElementById('fc').style.color = count ? '#8B00FF' : '#c00';
+}
+
+function doReplace(){
+  const f = document.getElementById('fr-f').value;
+  const r = document.getElementById('fr-r').value;
+  const st = document.getElementById('s-fr');
+  if(!f){st.className='st err';st.textContent='Enter text to find.';return;}
+  // Replace in all D string values
+  let count=0;
+  for(const k in D){
+    if(typeof D[k]==='string'){
+      const orig=D[k];
+      D[k]=D[k].split(f).join(r);
+      if(D[k]!==orig) count++;
+    }
+  }
+  // Repopulate fields from D
+  init_fields();
+  refreshPreview();
+  st.className='st ok';
+  st.textContent = count ? `✓ Replaced in ${count} field(s)!` : 'No matches found.';
+  setTimeout(()=>{st.textContent='';st.className='st';},2500);
+  document.getElementById('fc').textContent='';
+}
+
+function init_fields(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('t-tagline',D.hero_tagline); set('t-location',D.hero_location);
+  set('t-about1',D.about_p1); set('t-about2',D.about_p2);
+  set('t-fam-title',D.fam_title); set('t-fam-text',D.fam_text);
+  set('t-r1-text',D.r1_text); set('t-r1-author',D.r1_author);
+  set('t-r2-text',D.r2_text); set('t-r2-author',D.r2_author);
+  set('t-ftag',D.ftag); set('t-copy',D.copy);
+  set('v-hero',D.v_hero); set('v-hero-ref',D.v_hero_ref);
+  set('v-about',D.v_about); set('v-about-ref',D.v_about_ref);
+  set('v-faith',D.v_faith); set('v-faith-ref',D.v_faith_ref);
+  set('v-banner',D.v_banner); set('v-banner-ref',D.v_banner_ref);
+  set('v-family',D.v_family); set('v-family-ref',D.v_family_ref);
+  set('sv1-title',D.sv1_title); set('sv1-desc',D.sv1_desc);
+  set('sv2-title',D.sv2_title); set('sv2-desc',D.sv2_desc);
+  set('sv3-title',D.sv3_title); set('sv3-desc',D.sv3_desc);
+  set('ct-phone',D.phone); set('ct-a1',D.addr1); set('ct-a2',D.addr2);
+  set('ct-hours',D.hours); set('ct-weekend',D.weekend);
+  set('car-title',D.car_title); set('car-text',D.car_text); set('car-url',D.car_url);
+  set('pr1',D.perk1); set('pr2',D.perk2); set('pr3',D.perk3); set('pr4',D.perk4); set('pr5',D.perk5);
+}
+</script>
+</body>
+</html>
